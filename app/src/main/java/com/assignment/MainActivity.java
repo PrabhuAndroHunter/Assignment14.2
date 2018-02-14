@@ -1,8 +1,11 @@
 package com.assignment;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     Button mButton;
     String extStorageDirectory;
     File file;
+    private static final int PERMISSION_REQUEST_STORAGE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,5 +54,41 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "saved", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            Log.d(TAG, "onStart: permission granted"); // if granted go to next screen
+        } else {
+            // Permission is missing and must be requested.
+            requestStoragePermission();
+        }
+    }
+
+    private void requestStoragePermission() {
+        // Permission has not been granted and must be requested.
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                PERMISSION_REQUEST_STORAGE);
+    }
+
+     /*
+    *
+    * This method will handle runtime permission request output( User selection )
+    *
+    * */
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+
+        if (requestCode == PERMISSION_REQUEST_STORAGE) {
+            // if user granted Storage permission start HomeScreenActivity
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Thank you", Toast.LENGTH_SHORT).show();
+            } else {
+            }
+        }
     }
 }
